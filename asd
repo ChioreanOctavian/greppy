@@ -1,0 +1,48 @@
+Greppy REST API
+    The application is based on MVC architecture. The main purpose of this application is to expose a REST API for calendar
+events.
+The API have the following endpoints: create an user; authenticate user; select events in a calendar, and have the option
+to filter by date and sort events chronologically; create an event; update an event; delete an event;
+
+    The endpoints are:
+        -create user:       (POST)   /user;
+        -authenticate user: (POST)   /auth ;
+        -events listing:    (GET)    /events?dateFrom=<date>&hourFrom=<Time>&sort=date:asc
+                                            ?dateTo=<date>&hourTo=<Time>&sort=date:desc;
+        -create event:      (POST)   /event
+        -update event:      (PUT)    /event/{id}
+        -delete event       (DELETE) /event/{id}
+
+
+    Database architecture:
+
++-------+-----------------------------------------------------------------------------+
+| user(
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(50) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------+-----------------------------------------------------------------------------+
+
++-------+-----------------------------------------------------------------------------+
+| event(
+  `id` int NOT NULL AUTO_INCREMENT,
+  `description` varchar(300) DEFAULT NULL,
+  `date` datetime NOT NULL,
+  `location` varchar(50) NOT NULL,
+  `userId` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userId` (`userId`),
+  CONSTRAINT `event_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------+------------------------------------------------------------------------------+
+
+    Application architecture:
+
+    Being an REST API the communication protocol is HTTP. The application create a request and by handling it return a
+response. In the Router class check if the route exists and create a RouteMach object with specifications of route, like
+controller name, action, method and path. If route doe not exists return a response with status code 404 and a message.
+After finding a route Dispatcher class is working to call the right method of controller. In controllers we use
+repositories for connection with db. For a better code and to helped with injecting dependencies I use Inversion of Control
+pattern with dependency injection container.
